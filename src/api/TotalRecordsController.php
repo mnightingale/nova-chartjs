@@ -2,6 +2,7 @@
 
 namespace Coroowicaksono\ChartJsIntegration\Api;
 
+use Coroowicaksono\ChartJsIntegration\Traits\ManipulateDataSets;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
@@ -12,6 +13,8 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 class TotalRecordsController extends Controller
 {
     use ValidatesRequests;
+    use ManipulateDataSets;
+
     /**
      * @param \Laravel\Nova\Http\Requests\NovaRequest $request
      * @return \Illuminate\Http\JsonResponse
@@ -218,7 +221,9 @@ class TotalRecordsController extends Controller
                     }
                 }
             }
-            $dataSet = $query->get();
+            $dataSet = (static::$manipulateDataSetUsing ?: function ($data) {
+                return $data;
+            })($query->get());
             $xAxis = collect($dataSet)->map(function ($item, $key) use ($unitOfMeasurement){
                 if($unitOfMeasurement=='week'){
                     $splitCat = str_split($item->only(['cat'])['cat'], 4);

@@ -2,6 +2,7 @@
 
 namespace Coroowicaksono\ChartJsIntegration\Api;
 
+use Coroowicaksono\ChartJsIntegration\Traits\ManipulateDataSets;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Carbon;
@@ -12,6 +13,7 @@ use Laravel\Nova\Http\Requests\NovaRequest;
 class TotalCircleController extends Controller
 {
     use ValidatesRequests;
+    use ManipulateDataSets;
     /**
      * @param \Laravel\Nova\Http\Requests\NovaRequest $request
      * @return \Illuminate\Http\JsonResponse
@@ -109,7 +111,9 @@ class TotalCircleController extends Controller
                     }
                 }
             }
-            $dataSet = $query->get();
+            $dataSet = (static::$manipulateDataSetUsing ?: function ($data) {
+                return $data;
+            })($query->get());
             $xAxis = collect($labelList);
             if(isset($request->series)){
                 $countKey = 0;
